@@ -184,11 +184,8 @@ CREATE TABLE tasks (
 
 # Future Improvements
 
-- Validation middleware
-- Centralized error handling
 - Authentication
 - Authorization
-- Route parameter based REST APIs
 - Docker deployment
 - Logging system
 - Rate limiting
