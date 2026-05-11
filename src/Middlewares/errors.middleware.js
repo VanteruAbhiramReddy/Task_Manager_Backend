@@ -12,10 +12,10 @@ const errorMiddleware = (err, req, res, next) => {
         field: error.path.join("."),
         message: error.message
       }))
-    });
+    })
   }
 
-  if (err.statusCode) {
+  if (err.isOperational) {
     return res.status(err.statusCode).json({
       success: false,
       message: err.message
@@ -28,4 +28,4 @@ const errorMiddleware = (err, req, res, next) => {
   })
 }
 
-export default errorMiddleware;
+export default errorMiddleware

@@ -1,15 +1,15 @@
 import db from '../db/db.js'
 import AppError from '../Utilities/appError.js';
 
-export async function getTasks() {
-    const res = await db.query('SELECT * FROM TASKS;');
+export async function getTasks(userId) {
+    const res = await db.query('SELECT * FROM TASKS WHERE USER_ID=$1;',[userId]);
     if (res.rows.length === 0) throw new AppError("Tasks not found", 404);
     return res.rows;
 }
 
-export async function createTask({ title, description }) {
+export async function createTask({ title, description , userId}) {
     try {
-        const res = await db.query('INSERT INTO TASKS(TITLE,DESCRIPTION) VALUES($1,$2) RETURNING *;', [title, description]);
+        const res = await db.query('INSERT INTO TASKS(TITLE,DESCRIPTION,USER_ID) VALUES($1,$2,$3) RETURNING *;', [title, description,userId]);
         return res.rows[0];
     } catch (err) {
         if (err.code === 23505) throw new AppError("Duplicate task", 409);
@@ -17,9 +17,9 @@ export async function createTask({ title, description }) {
     }
 }
 
-export async function putTask({ id, title, description, completed }) {
+export async function putTask({ id, title, description, completed, userId }) {
     try {
-        const res = await db.query('UPDATE TASKS SET TITLE = $1, DESCRIPTION = $2, COMPLETED = $3 WHERE ID = $4 RETURNING *', [title, description, completed, id]);
+        const res = await db.query('UPDATE TASKS SET TITLE = $1, DESCRIPTION = $2, COMPLETED = $3 WHERE ID = $4 AND USER_ID = $5 RETURNING *', [title, description, completed, id, userId]);
         if (res.rows.length === 0) throw new AppError("Task not found", 404);
         return res.rows[0];
     } catch (err) {
@@ -28,8 +28,8 @@ export async function putTask({ id, title, description, completed }) {
     }
 }
 
-export async function dropTask(id) {
-    const res = await db.query('DELETE FROM TASKS WHERE ID = $1 RETURNING *;', [id]);
+export async function dropTask({id,userId}) {
+    const res = await db.query('DELETE FROM TASKS WHERE ID = $1 AND USER_ID = $2 RETURNING *;', [id,userId]);
     if (res.rows.length === 0) throw new AppError("Task not found", 404);
     return res.rows[0];
 }

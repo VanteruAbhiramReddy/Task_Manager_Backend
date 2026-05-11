@@ -1,16 +1,38 @@
 # Task Manager Backend
 
-A REST API backend for a task management application built with Node.js, Express, and PostgreSQL.
+A RESTful backend API for a multi-user task management application built with Node.js, Express, and PostgreSQL.
 
-This project was created to practice backend fundamentals including:
+This project was built to strengthen backend engineering fundamentals by implementing authentication, session management, authorization, PostgreSQL relationships, and modular Express architecture manually without relying on authentication frameworks.
 
-- REST APIs
-- CRUD operations
-- Express.js
-- PostgreSQL integration
-- Backend routing
-- SQL queries
-- Async database operations
+---
+
+# Features
+
+## Authentication & Sessions
+
+- User signup and login
+- Password hashing with bcrypt
+- Session-based authentication
+- HTTP-only cookie authentication
+- Logout with session invalidation
+- Protected routes using custom auth middleware
+
+## Task Management
+
+- Create tasks
+- Fetch authenticated user's tasks
+- Update owned tasks
+- Delete owned tasks
+- Ownership-based authorization
+
+## Backend Architecture
+
+- Modular Express architecture
+- Controllers / Services separation
+- Reusable validation middleware
+- Centralized async error handling
+- PostgreSQL relational database design
+- RESTful API structure
 
 ---
 
@@ -20,59 +42,82 @@ This project was created to practice backend fundamentals including:
 - Express.js
 - PostgreSQL
 - pg
+- bcrypt
+- cookie-parser
+- zod
 - dotenv
 - cors
-
----
-
-# Features
-
-- Create tasks
-- Get all tasks
-- Get single task
-- Update tasks
-- Delete tasks
-- PostgreSQL database integration
-- RESTful API architecture
 
 ---
 
 # Project Structure
 
 ```txt
-Task_Manager_Backend/
-├── src/
-│   ├── controllers/
-│   ├── routes/
-│   ├── services/
-│   └── db/
-│
-├── server.js
-├── package.json
-└── .env
+src/
+├── controllers/
+├── middlewares/
+├── routes/
+├── schemas/
+├── services/
+├── validators/
+├── utilities/
+├── db/
+└── server.js
 ```
 
 ---
 
 # API Endpoints
 
-## Create Task
+## Authentication
+
+### Signup
+
+```http
+POST /auth/signup
+```
+
+Example body:
+
+```json
+{
+  "name": "Abhiram",
+  "email": "abhiram@example.com",
+  "password": "strongpassword"
+}
+```
+
+---
+
+### Login
+
+```http
+POST /auth/login
+```
+
+---
+
+### Logout
+
+```http
+POST /auth/logout
+```
+
+---
+
+# Tasks
+
+All task routes require authentication.
+
+### Create Task
 
 ```http
 POST /tasks
 ```
 
-Example body:
-
-```json
-{
-  "title": "Learn Express"
-}
-```
-
 ---
 
-## Get All Tasks
+### Get User Tasks
 
 ```http
 GET /tasks
@@ -80,52 +125,18 @@ GET /tasks
 
 ---
 
-## Get Single Task
+### Update Task
 
 ```http
-GET /tasks
-```
-
-Example body:
-
-```json
-{
-  "id": 1
-}
+PUT /tasks/:id
 ```
 
 ---
 
-## Update Task
+### Delete Task
 
 ```http
-PUT /tasks
-```
-
-Example body:
-
-```json
-{
-  "id": 1,
-  "title": "Learn PostgreSQL",
-  "completed": true
-}
-```
-
----
-
-## Delete Task
-
-```http
-DELETE /tasks
-```
-
-Example body:
-
-```json
-{
-  "id": 1
-}
+DELETE /tasks/:id
 ```
 
 ---
@@ -171,14 +182,54 @@ npm run dev
 
 # Database Schema
 
+## Users
+
 ```sql
-CREATE TABLE tasks (
-  id SERIAL PRIMARY KEY,
-  title TEXT NOT NULL,
-  description text,
-  completed BOOLEAN DEFAULT false
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL
 );
 ```
+
+## Sessions
+
+```sql
+CREATE TABLE sessions (
+    id UUID PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id)
+        ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+## Tasks
+
+```sql
+CREATE TABLE tasks (
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT,
+    completed BOOLEAN DEFAULT false,
+    user_id INTEGER REFERENCES users(id)
+        ON DELETE CASCADE,
+    UNIQUE(title, user_id)
+);
+```
+
+---
+
+# Concepts Practiced
+
+- REST API design
+- Session-based authentication
+- Cookie handling
+- Authorization & ownership validation
+- Express middleware architecture
+- PostgreSQL relationships & constraints
+- Async error handling
+- Request lifecycle management
 
 ---
 
@@ -189,18 +240,10 @@ CREATE TABLE tasks (
 - Docker deployment
 - Logging system
 - Rate limiting
-
----
-
-# Learning Goals
-
-This project was built to strengthen understanding of:
-
-- backend development
-- REST APIs
-- SQL databases
-- async programming
-- Express.js architecture
+- Dockerization
+- API documentation
+- Automated testing
+- Redis-based session storage
 
 ---
 
