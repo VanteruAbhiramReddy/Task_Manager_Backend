@@ -6,8 +6,7 @@ class AppError extends Error {
     this.success = false
     this.isOperational = true
 
-    this.status =
-      String(statusCode).startsWith("4")
+    this.status = String(statusCode).startsWith("4")
         ? "fail"
         : "error"
 

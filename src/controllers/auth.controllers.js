@@ -1,6 +1,5 @@
 import asyncHandler from '../Utilities/asyncHandler.js'
 import {createUser,loginUser} from '../services/users.services.js'
-import { createSession,deleteSession } from '../services/sessions.services.js';
 
 export const signUpController = asyncHandler(async (req,res,next) => {
     const {name,email,password} = req.validated;
@@ -18,21 +17,14 @@ export const loginController = asyncHandler(async (req,res,next) => {
 
 export const manageNewSession = asyncHandler(async (req,res) => {
     const id = req.userId;
-    const session = await createSession(id);
-    
-    res.cookie("sessionId",session.id,{
-        httpOnly : true
-    })
+    req.session.userId = id;
 
-    res.status(201).json({
-        success : true
-    })
+    res.json({"success":true})
 })
 
 export const logoutController = asyncHandler(async (req,res)=>{
-    const sessionId = req.sessionId;
-    await deleteSession(sessionId);
-
-    res.clearCookie("sessionId",{httpOnly:true});
-    res.status(200).json({"success" : true});
+    req.session.destroy(()=>{
+        res.clearCookie("connect.sid");
+        res.json({"success":true})
+    })
 })

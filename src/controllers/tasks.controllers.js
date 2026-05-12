@@ -2,7 +2,7 @@ import { getTasks, createTask, putTask, dropTask } from "../services/tasks.servi
 import asyncHandler from '../Utilities/asyncHandler.js'
 
 export const fetchTasks = asyncHandler(async (req, res) => {
-    const userId = req.userId
+    const userId = req.userId;
     const tasks = await getTasks(userId);
     res.status(200).json(tasks);
 })

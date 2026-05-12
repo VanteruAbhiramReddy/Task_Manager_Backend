@@ -8,7 +8,7 @@ export async function createUser({ name, email, password }) {
         const res = await db.query('INSERT INTO USERS(NAME,EMAIL,PASSWORD) VALUES($1,$2,$3) RETURNING ID;', [name, email, hashed]);
         return res.rows[0];
     } catch (error) {
-        if (error.code === 23505) {
+        if (error.code === "23505") {
             throw new AppError('Email already registered', 409)
         }
         throw error;

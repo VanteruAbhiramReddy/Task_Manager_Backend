@@ -12,7 +12,6 @@ export async function createTask({ title, description , userId}) {
         const res = await db.query('INSERT INTO TASKS(TITLE,DESCRIPTION,USER_ID) VALUES($1,$2,$3) RETURNING *;', [title, description,userId]);
         return res.rows[0];
     } catch (err) {
-        if (err.code === 23505) throw new AppError("Duplicate task", 409);
         throw err;
     }
 }
@@ -23,7 +22,6 @@ export async function putTask({ id, title, description, completed, userId }) {
         if (res.rows.length === 0) throw new AppError("Task not found", 404);
         return res.rows[0];
     } catch (err) {
-        if (err.code === 23505) throw new AppError("Duplicate task", 409);
         throw err
     }
 }
