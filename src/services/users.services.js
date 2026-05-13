@@ -17,17 +17,14 @@ export async function createUser({ name, email, password }) {
 
 export async function loginUser({ email, password }) {
     const res = await db.query('SELECT * from USERS WHERE email = $1;',[email]);
-    const data = res.rows;
+    const data = res.rows[0];
 
-    if (data.length === 0) {
-        throw new AppError("User not found", 404);
-    }
-    const user = data[0]
-    const verify = await bcrypt.compare(password, user.password);
+    if(!data) throw new AppError("Invalid Crendentials",401);
+    const verify = await bcrypt.compare(password, data.password);
 
     if (!verify) {
-        throw new AppError("Unauthenticated entry", 401);
+        throw new AppError("Invalid Credentials!", 401);
     }
-    delete user.password;
-    return user;
+    delete data.password;
+    return data;
 }
